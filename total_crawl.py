@@ -8,13 +8,16 @@ from time import sleep
 import codecs
 import argparse
 
+isEnd = False
 
 def gogo(page_num):
+
     # driver = webdriver.Chrome("./selenium/chromedriver")
     # #driver.implicitly_wait(3)
     # driver.get('http://www.ddanzi.com/free')
     # sleep(3)
 
+    html = None
     url = "http://www.ddanzi.com/index.php?mid=free&page={}".format(page_num)
     try:
         html = urlopen(url)
@@ -29,7 +32,7 @@ def gogo(page_num):
 
     #print(len(columns))
 
-    columns.reverse()
+    #columns.reverse()
 
     total_list = []
     for _index, _column in enumerate(columns):
@@ -40,6 +43,10 @@ def gogo(page_num):
             # print("{} ~ {}".format(i, td))
             if i == 0:
                 if td.text.strip() == '공지':
+                    break
+                elif td.text.strip() == 0 or int(td.text.strip()) < 0:
+                    global isEnd
+                    isEnd = True
                     break
 
             if i == 1:
@@ -58,16 +65,20 @@ def gogo(page_num):
 def main(args):
     page = args.start
     end_page = args.end
-    with codecs.open('ddanzi_total_{}.tsv'.format(args.start), 'a', encoding='utf8') as f:
+    with codecs.open('./logs/ddanzi_total.tsv'.format(args.start), 'a', encoding='utf8') as f:
         while True:
             result = gogo(page)
             for content in result:
                 f.write(content)
                 f.write('\n')
 
-            page = page - 1
-            if page < end_page:
+            page = page + 1
+            if page > end_page:
                 break
+
+            if isEnd:
+                break
+
             sleep(1)
 
 
