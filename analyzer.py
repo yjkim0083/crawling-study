@@ -5,7 +5,7 @@ import pymysql
 import codecs
 import datetime
 
-data = pd.read_csv('./logs/40001_50000.log', encoding='utf-8', sep='\t\t', header=None, engine='python')
+data = pd.read_csv('./logs/all.tsv', encoding='utf-8', sep='\t\t', header=None, engine='python')
 df = data.loc[:, [2,3,4,5,6,7]].copy()
 df = df.drop_duplicates()
 df = df.fillna('')
@@ -53,12 +53,10 @@ for line in list:
         print("PASS!!!!!!!!!!!", values)
         continue
 
-    print(line)
-
     cursor.execute(sql, (values[3], values[0], values[2], values[4], values[5], values[1]))
     cnt += 1
-    if cnt % 100 == 0:
-        db.commit()
+    if cnt % 1000 == 0:
+        print(cnt)
 
 db.commit()
 db.close()
